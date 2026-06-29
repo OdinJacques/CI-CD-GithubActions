@@ -2,7 +2,7 @@
 
 A modern Front-End Automation Testing framework built with Playwright, TypeScript, and scalable automation architecture principles.
 
-This project represents my growing expertise in Front-End Quality Engineering, UI automation, and CI/CD integration, focusing on:
+This project represents my growing expertise in Front-End Quality Engineering, UI automation, API testing, and CI/CD integration, focusing on:
 
 - scalable Playwright architecture
 - maintainable automation patterns
@@ -11,6 +11,7 @@ This project represents my growing expertise in Front-End Quality Engineering, U
 - clean TypeScript implementation
 - reusable Page Object Models
 - centralized locator management
+- REST API test automation
 - CI/CD pipeline integration with GitHub Actions
 - modern QE best practices
 
@@ -23,6 +24,7 @@ The main purpose of this repository is to demonstrate my practical knowledge in:
 - Front-End Automation
 - UI Functional Testing
 - End-to-End Testing
+- REST API Testing
 - Playwright + TypeScript
 - Test Architecture Design
 - Page Object Model implementation
@@ -42,7 +44,7 @@ This project continuously evolves as I improve my QA Engineering and automation 
 | Technology | Purpose |
 |---|---|
 | TypeScript | Main programming language |
-| Playwright | End-to-End automation framework |
+| Playwright | End-to-End and API automation |
 | Node.js | Runtime environment |
 | Dotenvx | Environment variable management |
 | Page Object Model | Framework architecture |
@@ -103,6 +105,15 @@ This project continuously evolves as I improve my QA Engineering and automation 
 - Menu close interaction
 - Reset App State from burger menu
 
+### API Testing (GoRest API)
+
+- User CRUD operations (Create, Read, Update, Patch, Delete)
+- User validation (invalid email, gender, status)
+- Post creation and retrieval
+- Comment management on posts
+- ToDo task creation and status management
+- Sequential test execution for dependent flows
+
 ---
 
 ## Framework Architecture
@@ -136,7 +147,21 @@ Frontend-Foundations
 │   ├── items.spec.ts
 │   ├── myCart.spec.ts
 │   ├── checkout.spec.ts
-│   └── about.spec.ts
+│   ├── about.spec.ts
+│   └── API/
+│       ├── user.spec.ts
+│       ├── posts.spec.ts
+│       ├── comments.spec.ts
+│       └── toDos.spec.ts
+│
+├── Interface/
+│   ├── user.ts
+│   ├── post.ts
+│   ├── comments.ts
+│   └── toDos.ts
+│
+├── dataApi/
+│   └── user.ts
 │
 ├── types/
 │   ├── index.ts
@@ -260,6 +285,61 @@ XPath selectors are intentionally avoided to reduce brittleness and improve long
 
 ---
 
+## API Testing
+
+The framework includes a dedicated REST API test suite targeting the [GoRest public API](https://gorest.co.in/).
+
+### API Test Coverage
+
+| Suite | File | Description |
+|---|---|---|
+| Users | `tests/API/user.spec.ts` | Full CRUD + validation |
+| Posts | `tests/API/posts.spec.ts` | Post creation and retrieval |
+| Comments | `tests/API/comments.spec.ts` | Comment management on posts |
+| ToDos | `tests/API/toDos.spec.ts` | Task creation and status |
+
+### TypeScript Interfaces
+
+API response models are typed using dedicated interfaces under `Interface/`:
+
+```ts
+// Interface/user.ts
+export interface User {
+  id?: number;
+  name: string;
+  email: string;
+  gender: string;
+  status: string;
+}
+```
+
+### Shared Test Data
+
+Reusable test data objects are stored under `dataApi/` and imported by the specs that need them:
+
+```ts
+// dataApi/user.ts
+export const userData: User = {
+  name: Math.random().toString(36).substring(2, 15),
+  email: Math.random().toString(36).substring(2, 15) + '@example.com',
+  gender: 'male',
+  status: 'active',
+};
+```
+
+### Environment Configuration
+
+API tests read credentials from a `.env` file in the project root:
+
+```env
+baseURL = "https://gorest.co.in"
+token = YOUR_GOREST_API_TOKEN
+```
+
+Get a free token at [gorest.co.in](https://gorest.co.in/).
+
+---
+
 ## Best Practices Applied
 
 - Page Object Model (POM)
@@ -276,6 +356,8 @@ XPath selectors are intentionally avoided to reduce brittleness and improve long
 - Clean TypeScript typing
 - Separation of concerns
 - Environment variable management with Dotenvx
+- TypeScript interfaces for API response models
+- Serial test execution for dependent API flows
 - Playwright browser caching in CI
 - Retries enabled on CI for external dependency resilience
 - Reduced selector maintenance overhead
@@ -314,6 +396,12 @@ npx playwright test --ui
 npx playwright test tests/login.spec.ts
 ```
 
+### Run only API tests
+
+```bash
+npx playwright test tests/API/
+```
+
 ### Open HTML report
 
 ```bash
@@ -341,6 +429,8 @@ This repository showcases my ability to:
 - implement Playwright best practices
 - write clean TypeScript automation
 - create reusable Page Objects
+- build REST API test suites with Playwright
+- model API responses with TypeScript interfaces
 - implement locator optimization strategies
 - create scalable locator abstraction systems
 - improve accessibility-aware automation
