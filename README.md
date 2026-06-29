@@ -2,7 +2,7 @@
 
 A modern Front-End Automation Testing framework built with Playwright, TypeScript, and scalable automation architecture principles.
 
-This project represents my growing expertise in Front-End Quality Engineering, UI automation, and API testing, focusing on:
+This project represents my growing expertise in Front-End Quality Engineering, UI automation, and CI/CD integration, focusing on:
 
 - scalable Playwright architecture
 - maintainable automation patterns
@@ -11,7 +11,7 @@ This project represents my growing expertise in Front-End Quality Engineering, U
 - clean TypeScript implementation
 - reusable Page Object Models
 - centralized locator management
-- REST API test automation
+- CI/CD pipeline integration with GitHub Actions
 - modern QE best practices
 
 ---
@@ -23,7 +23,6 @@ The main purpose of this repository is to demonstrate my practical knowledge in:
 - Front-End Automation
 - UI Functional Testing
 - End-to-End Testing
-- REST API Testing
 - Playwright + TypeScript
 - Test Architecture Design
 - Page Object Model implementation
@@ -31,6 +30,7 @@ The main purpose of this repository is to demonstrate my practical knowledge in:
 - Maintainable automation frameworks
 - Scalable test organization
 - Cross-browser testing
+- CI/CD pipeline configuration
 - Automation best practices
 
 This project continuously evolves as I improve my QA Engineering and automation architecture skills.
@@ -42,11 +42,12 @@ This project continuously evolves as I improve my QA Engineering and automation 
 | Technology | Purpose |
 |---|---|
 | TypeScript | Main programming language |
-| Playwright | End-to-End and API automation |
+| Playwright | End-to-End automation framework |
 | Node.js | Runtime environment |
 | Dotenvx | Environment variable management |
 | Page Object Model | Framework architecture |
 | Centralized Locators | Shared selector architecture |
+| GitHub Actions | CI/CD pipeline |
 | HTML Reports | Test reporting |
 
 ---
@@ -55,63 +56,52 @@ This project continuously evolves as I improve my QA Engineering and automation 
 
 ### Authentication Testing
 
-- Valid login flows
+- Valid login flows across all user types
 - Invalid credentials validation
-- Locked user validation
-- Error handling verification
-- Logout validation
+- Locked user error handling
+- Performance glitch user detection
+- Logout and session invalidation verification
 
 ### Inventory / Home Page Testing
 
-- Product visibility validation
-- Product information verification
-- Cart badge validation
-- Add/remove cart interactions
-- Product navigation testing
-- Burger menu functionality
-- Reset app state validation
-- Sorting validation (A-Z, Z-A, low-to-high, high-to-low price)
+- Product visibility and content validation
+- Product name, description, price and image verification
+- Cart badge add/remove interactions
+- Default and custom sort order validation (A–Z, Z–A, low–high, high–low price)
+- Burger menu open/close functionality
+- Reset App State verification
 - Cart synchronization validation
-- Accessibility-oriented locator validation
 
 ### Product Details Testing
 
-- Product information validation
-- Add/remove cart actions
-- Cart synchronization
-- Navigation flows
-- Product image validation
+- Product name, description, price, and image validation
+- Add to cart and Remove button state transitions
+- Cart count synchronization from detail page
+- Navigation back to products
+- Cross-product navigation by ID
 
 ### Cart Testing
 
-- Empty cart validation
-- Item persistence after navigation
+- Empty cart on first login
+- Item persistence across navigation
 - Item names and prices verification
 - Continue shopping functionality
 - Proceed to checkout navigation
 
 ### Checkout Testing
 
-- Successful checkout flow
-- Checkout validation errors
-- Missing required fields validation
-- Order completion verification
-- End-to-end checkout workflow
+- Successful end-to-end checkout flow
+- Missing first name validation
+- Missing last name validation
+- Missing postal code validation
+- Order completion and redirect verification
 
 ### Navigation & Menu Testing
 
-- About page redirection validation
-- Burger menu interactions
-- Navigation link validations
-
-### API Testing (GoRest API)
-
-- User CRUD operations (Create, Read, Update, Patch, Delete)
-- User validation (invalid email, gender, status)
-- Post creation and retrieval
-- Comment management on posts
-- ToDo task creation and status management
-- Sequential test execution for dependent flows
+- About page external redirection validation
+- Burger menu link visibility
+- Menu close interaction
+- Reset App State from burger menu
 
 ---
 
@@ -119,6 +109,10 @@ This project continuously evolves as I improve my QA Engineering and automation 
 
 ```text
 Frontend-Foundations
+│
+├── .github/
+│   └── workflows/
+│       └── playwright.yml
 │
 ├── locators/
 │   ├── basePage.locators.ts
@@ -142,27 +136,45 @@ Frontend-Foundations
 │   ├── items.spec.ts
 │   ├── myCart.spec.ts
 │   ├── checkout.spec.ts
-│   ├── about.spec.ts
-│   └── API/
-│       ├── user.spec.ts
-│       ├── posts.spec.ts
-│       ├── comments.spec.ts
-│       └── toDos.spec.ts
-│
-├── Interface/
-│   ├── user.ts
-│   ├── post.ts
-│   ├── comments.ts
-│   └── toDos.ts
+│   └── about.spec.ts
 │
 ├── types/
 │   ├── index.ts
 │   └── ui.ts
 │
-├── .env
 ├── playwright.config.ts
 └── package.json
 ```
+
+---
+
+## CI/CD Pipeline
+
+This project uses **GitHub Actions** to automatically run the full test suite on every push or pull request to `main`.
+
+### Workflow: `.github/workflows/playwright.yml`
+
+```yaml
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+```
+
+### Pipeline steps
+
+1. Checkout repository
+2. Set up Node.js (LTS)
+3. Install dependencies (`npm ci`)
+4. Cache Playwright browsers (keyed by `package-lock.json`)
+5. Install Playwright browsers and OS dependencies
+6. Run all tests across Chromium, Firefox, and WebKit
+7. Upload the HTML report as a downloadable artifact (retained 30 days)
+
+### Artifacts
+
+The HTML test report is uploaded after every run — including failed runs — and is available under the **Actions** tab in GitHub.
 
 ---
 
@@ -248,47 +260,6 @@ XPath selectors are intentionally avoided to reduce brittleness and improve long
 
 ---
 
-## API Testing
-
-The framework includes a dedicated REST API test suite targeting the [GoRest public API](https://gorest.co.in/).
-
-### API Test Coverage
-
-| Suite | File | Description |
-|---|---|---|
-| Users | `tests/API/user.spec.ts` | Full CRUD + validation |
-| Posts | `tests/API/posts.spec.ts` | Post creation and retrieval |
-| Comments | `tests/API/comments.spec.ts` | Comment management on posts |
-| ToDos | `tests/API/toDos.spec.ts` | Task creation and status |
-
-### TypeScript Interfaces
-
-API response models are typed using dedicated interfaces under `Interface/`:
-
-```ts
-// Interface/user.ts
-export interface User {
-  id?: number;
-  name: string;
-  email: string;
-  gender: string;
-  status: string;
-}
-```
-
-### Environment Configuration
-
-API tests require a `.env` file in the project root:
-
-```env
-baseURL = "https://gorest.co.in/"
-token = YOUR_GOREST_API_TOKEN
-```
-
-Get a free token at [gorest.co.in](https://gorest.co.in/).
-
----
-
 ## Best Practices Applied
 
 - Page Object Model (POM)
@@ -299,14 +270,14 @@ Get a free token at [gorest.co.in](https://gorest.co.in/).
 - Semantic Playwright locators
 - Async/Await implementation
 - Minimal flaky selectors
-- Shared setup with beforeEach
-- Cross-browser configuration
-- Failure screenshots/traces/videos
+- Shared setup with `beforeEach`
+- Cross-browser configuration (Chromium, Firefox, WebKit)
+- Failure screenshots, traces, and videos
 - Clean TypeScript typing
 - Separation of concerns
-- TypeScript interfaces for API models
 - Environment variable management with Dotenvx
-- Serial test execution for dependent API flows
+- Playwright browser caching in CI
+- Retries enabled on CI for external dependency resilience
 - Reduced selector maintenance overhead
 
 ---
@@ -343,12 +314,6 @@ npx playwright test --ui
 npx playwright test tests/login.spec.ts
 ```
 
-### Run only API tests
-
-```bash
-npx playwright test tests/API/
-```
-
 ### Open HTML report
 
 ```bash
@@ -367,25 +332,6 @@ Current configuration supports:
 
 ---
 
-## Framework Improvements
-
-Recent framework improvements include:
-
-- REST API test suite with full CRUD coverage
-- TypeScript interfaces for API response models
-- Environment variable management via Dotenvx
-- Centralized locator abstraction layer
-- Reusable locator architecture
-- Reduced brittle CSS selectors
-- Cleaner separation between locators and page actions
-- Improved selector consistency
-- Improved Page Object maintainability
-- Accessibility-focused locator strategy
-- Cleaner TypeScript structure
-- More stable end-to-end flows
-
----
-
 ## What This Project Demonstrates
 
 This repository showcases my ability to:
@@ -395,14 +341,14 @@ This repository showcases my ability to:
 - implement Playwright best practices
 - write clean TypeScript automation
 - create reusable Page Objects
-- build REST API test suites with Playwright
-- model API responses with TypeScript interfaces
-- improve test stability
-- structure real-world QE projects
-- apply modern QA Engineering principles
 - implement locator optimization strategies
 - create scalable locator abstraction systems
 - improve accessibility-aware automation
+- configure CI/CD pipelines with GitHub Actions
+- manage test artifacts and reporting in CI
+- improve test stability with retries and caching
+- structure real-world QE projects
+- apply modern QA Engineering principles
 
 ---
 
@@ -414,7 +360,7 @@ This repository functions as:
 - an automation playground
 - a professional QA portfolio project
 
-showcasing my growth in modern Front-End Quality Engineering, automation architecture, and API testing.
+showcasing my growth in modern Front-End Quality Engineering, automation architecture, and CI/CD integration.
 
 ---
 
